@@ -13,6 +13,7 @@ class Repartidores extends Model
         'nombre',
         'apellido',
         'tipoDocumentoId',
+        'numero_documento',
         'telefono',
         'email'
     ];

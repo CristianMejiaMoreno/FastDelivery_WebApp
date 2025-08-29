@@ -19,8 +19,9 @@ return new class extends Migration
                 ->constrained('tipo_documentos')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
+            $table->string('numero_documento');
             $table->string('telefono');
-            $table->string('email');
+            $table->string('email')->nullable();
             $table->timestamps();
         });
     }

@@ -5,4 +5,5 @@ export interface Repartidor {
     telefono: string;
     email: string;
     tipoDocumentoId: number;
+    numero_documento: string;
 }
