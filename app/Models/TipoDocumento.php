@@ -10,4 +10,9 @@ class TipoDocumento extends Model
     use HasFactory;
 
     protected $fillable = ['id', 'nombre'];
+
+    public function repartidor()
+    {
+        return $this->hasMany(Repartidores::class, 'tipoDocumentoId');
+    }
 }
