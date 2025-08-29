@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('clientes', function (Blueprint $table) {
             $table->id();
+            $table->string('nombre_cliente');
+            $table->foreignId('tipoDocumentoId')
+            ->constrained('tipo_documentos')
+            ->cascadeOnDelete()
+            ->cascadeOnUpdate();
+            $table->string('numero_documento');
+            $table->string('telefono');
+            $table->string('email')->nullable();
             $table->timestamps();
         });
     }

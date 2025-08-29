@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('ventas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('pedidoId')
+                ->constrained('pedidos')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+            $table->decimal('monto');
+            $table->enum('metodo_pago', ['efectivo', 'transferencia', 'nequi']);
+            $table->enum('estado', ['pendiente', 'pago']);
+            $table->date('fecha_pago');
+            $table->text('observacion');
             $table->timestamps();
         });
     }
