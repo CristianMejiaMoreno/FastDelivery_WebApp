@@ -2,19 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Repartidores;
+use App\Models\Cliente;
 use Illuminate\Http\Request;
 
-class RepartidoresController extends Controller
+class ClienteController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $repartidores = Repartidores::paginate(15);
-
-        return response()->json($repartidores, 200);
+        //
     }
 
     /**
@@ -36,7 +34,7 @@ class RepartidoresController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Repartidores $repartidores)
+    public function show(Cliente $cliente)
     {
         //
     }
@@ -44,7 +42,7 @@ class RepartidoresController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Repartidores $repartidores)
+    public function edit(Cliente $cliente)
     {
         //
     }
@@ -52,7 +50,7 @@ class RepartidoresController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Repartidores $repartidores)
+    public function update(Request $request, Cliente $cliente)
     {
         //
     }
@@ -60,7 +58,7 @@ class RepartidoresController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Repartidores $repartidores)
+    public function destroy(Cliente $cliente)
     {
         //
     }
