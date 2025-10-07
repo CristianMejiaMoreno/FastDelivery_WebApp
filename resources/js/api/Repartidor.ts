@@ -2,12 +2,11 @@ import { Repartidor } from "@/interfaces/Repartidor";
 
 const BASE_URL = '/repartidores';
 
-export async function getRepartidores(page: number = 1) {
-  const res = await fetch(`/repartidores?page=${page}`);
+export async function getRepartidores(page: number = 1, q: string = '') {
+  const res = await fetch(`/repartidores/list?page=${page}&q=${encodeURIComponent(q)}`);
   if (!res.ok) throw new Error('Error al obtener repartidores');
-  return res.json(); 
+  return res.json();
 }
-
 
 export async function getRepartidor(id:number): Promise<Repartidor> {
     const res = await fetch(`${BASE_URL}/${id}`);
