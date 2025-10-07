@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class EditarRepartidor extends FormRequest
+class EditarCliente extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,10 +22,9 @@ class EditarRepartidor extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre'=>'sometimes|string|max:200',
-            'apellido'=>'sometimes|string|max:200',
-            'tipoDocumentoId'=>'sometimes|exists:tipo_documentos,id',
-            'numero_documento'=>'sometimes|numeric',
+            'nombre_cliente' => 'sometimes|string',
+            'tipodocumento_id' => 'sometimes|integer|exists:tipo_documentos,id',
+            'numero_documento' => 'sometimes|string',
             'telefono'=>'sometimes|string',
             'email'=>'sometimes|string'
         ];

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CrearRepartidor extends FormRequest
+class CrearCliente extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,15 +22,11 @@ class CrearRepartidor extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre'=>'required|string|max:200',
-            'apellido'=>'required|string|max:200',
-            'tipodocumento_id'=>'required|exists:tipo_documentos,id',
-            'numero_documento'=>'required|numeric',
+            'nombre_cliente' => 'required|string',
+            'tipodocumento_id' => 'required|integer|exists:tipo_documentos,id',
+            'numero_documento' => 'sometimes|string',
             'telefono'=>'required|string',
-            'email'=>'required|string',
-            'password'=>'required|string',
-            'porcentaje_marca'=>'required|integer',
-            'porcentaje_repartidor'=>'required|integer'
+            'email'=>'sometimes|string'
         ];
     }
 }
