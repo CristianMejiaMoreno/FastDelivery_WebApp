@@ -22,7 +22,12 @@ class EditarRepartidor extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nombre'=>'sometimes|string|max:200',
+            'apellido'=>'sometimes|string|max:200',
+            'tipoDocumentoId'=>'sometimes|exists:tipo_documentos,id',
+            'numero_documento'=>'sometimes|numeric',
+            'telefono'=>'sometimes|string',
+            'email'=>'sometimes|string'
         ];
     }
 }

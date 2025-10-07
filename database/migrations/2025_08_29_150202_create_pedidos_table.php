@@ -13,6 +13,37 @@ return new class extends Migration
     {
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
+            $table->string('codigo_pedido')->unique();
+            $table->foreignId('cliente_id')
+                ->constrained('clientes')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+            $table->foreignId('repartidor_id')
+                ->constrained('repartidores')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+            $table->foreignId('zona_id')
+                ->constrained('zonas')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+            $table->decimal('precio');
+            $table->date('fecha_pedido');
+            $table->date('fecha_entrega')->nullable();
+            $table->enum('estado',
+                [
+                    'pendiente',
+                    'asignado',
+                    'en camino',
+                    'cancelado',
+                    'entregado'
+                ]
+            )->default('pendiente');
+            $table->integer('porcentaje_marca');
+            $table->integer('porcentaje_mensajero');
+            $table->decimal('recaudo_mensajero');
+            $table->decimal('recaudo_empresa');
+            $table->decimal('total_mensajero');
+            $table->text('observacion');
             $table->timestamps();
         });
     }

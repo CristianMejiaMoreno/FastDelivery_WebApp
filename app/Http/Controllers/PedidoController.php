@@ -3,16 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pedido;
+use App\Services\PedidoService;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PedidoController extends Controller
 {
+    protected $pedidoService;
+
+    public function __construct(PedidoService $pedidoService) {
+        $this->pedidoService = $pedidoService;
+    }
+
+    public function list()
+    {
+        $pedidos = $this->pedidoService->getPedidos();
+
+        return response($pedidos, 200);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return Inertia::render('pedidos/index');
     }
 
     /**

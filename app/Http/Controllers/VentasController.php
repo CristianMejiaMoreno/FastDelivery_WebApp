@@ -4,15 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Models\Ventas;
 use Illuminate\Http\Request;
+use App\services\VentaService;
+use Inertia\Inertia;
 
 class VentasController extends Controller
 {
+
+    protected $ventasService;
+
+    public function __construct(VentaService $ventasService) {
+        $this->ventasService = $ventasService;
+    }
+
+    public function list(Request $request){
+        $page = $request->input('page');
+        $q = $request->input('q');
+
+        $ventas = $this->ventasService->getVentas($q);
+
+        return response()->json($ventas, 200);
+    }
+
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return Inertia::render('ventas/index');
     }
 
     /**

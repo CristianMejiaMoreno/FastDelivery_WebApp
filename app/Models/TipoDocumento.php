@@ -13,6 +13,6 @@ class TipoDocumento extends Model
 
     public function repartidor()
     {
-        return $this->hasMany(Repartidores::class, 'tipoDocumentoId');
+        return $this->hasMany(Repartidores::class, 'tipodocumento_id');
     }
 }

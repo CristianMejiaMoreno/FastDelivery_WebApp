@@ -19,7 +19,8 @@ class RepartidoresFactory extends Factory
         return [
             'nombre'=>$this->faker->name(),
             'apellido'=>$this->faker->lastName(),
-            'tipoDocumentoId'=>$this->faker->numberBetween(1,6),
+            'tipodocumento_id'=>$this->faker->numberBetween(1,6),
+            'numero_documento'=>$this->faker->unique()->numerify(str_repeat('#', 12)),
             'telefono'=>$this->faker->phoneNumber(),
             'email'=>$this->faker->email()
         ];
