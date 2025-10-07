@@ -2,27 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ventas;
+use App\Models\Zona;
+use App\Services\ZonaService;
 use Illuminate\Http\Request;
-use App\services\VentaService;
 use Inertia\Inertia;
 
-class VentasController extends Controller
+class ZonaController extends Controller
 {
 
-    protected $ventasService;
+    protected $zonaService;
 
-    public function __construct(VentaService $ventasService) {
-        $this->ventasService = $ventasService;
+    public function __construct(ZonaService $zonaService) {
+        $this->zonaService = $zonaService; 
     }
+    
 
-    public function list(Request $request){
-        $page = $request->input('page');
-        $q = $request->input('q');
+    public function list()
+    {
+        $zona = $this->zonaService->getZonas();
 
-        $ventas = $this->ventasService->getVentas($q);
-
-        return response()->json($ventas, 200);
+        return response($zona, 200);
     }
 
 
@@ -31,7 +30,7 @@ class VentasController extends Controller
      */
     public function index()
     {
-        return Inertia::render('ventas/index');
+        return Inertia::render('zonas/index');
     }
 
     /**
@@ -53,7 +52,7 @@ class VentasController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Ventas $ventas)
+    public function show(Zona $Zona)
     {
         //
     }
@@ -61,7 +60,7 @@ class VentasController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Ventas $ventas)
+    public function edit(Zona $Zona)
     {
         //
     }
@@ -69,7 +68,7 @@ class VentasController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Ventas $ventas)
+    public function update(Request $request, Zona $Zona)
     {
         //
     }
@@ -77,7 +76,7 @@ class VentasController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Ventas $ventas)
+    public function destroy(Zona $Zona)
     {
         //
     }
