@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Repartidores>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Cliente>
  */
-class RepartidoresFactory extends Factory
+class ClienteFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,12 +17,11 @@ class RepartidoresFactory extends Factory
     public function definition(): array
     {
         return [
-            'nombre'=>$this->faker->name(),
-            'apellido'=>$this->faker->lastName(),
+            'nombre_cliente'=>$this->faker->company(),
             'tipodocumento_id'=>$this->faker->numberBetween(1,6),
             'numero_documento'=>$this->faker->unique()->numerify(str_repeat('#', 12)),
             'telefono'=>$this->faker->phoneNumber(),
-            'email'=>$this->faker->email()
+            'email'=>$this->faker->unique()->email(),
         ];
     }
 }
