@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('clienteId')
+            $table->string('codigo_pedido')->unique();
+            $table->foreignId('cliente_id')
                 ->constrained('clientes')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
-            $table->foreignId('repartidorId')
+            $table->foreignId('repartidor_id')
                 ->constrained('repartidores')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
-            $table->foreignId('zonaId')
+            $table->foreignId('zona_id')
                 ->constrained('zonas')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
@@ -32,11 +33,16 @@ return new class extends Migration
                 [
                     'pendiente',
                     'asignado',
-                    'en camino', 
-                    'cancelado', 
+                    'en camino',
+                    'cancelado',
                     'entregado'
                 ]
             )->default('pendiente');
+            $table->integer('porcentaje_marca');
+            $table->integer('porcentaje_mensajero');
+            $table->decimal('recaudo_mensajero');
+            $table->decimal('recaudo_empresa');
+            $table->decimal('total_mensajero');
             $table->text('observacion');
             $table->timestamps();
         });

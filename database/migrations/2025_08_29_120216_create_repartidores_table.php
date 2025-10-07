@@ -15,13 +15,16 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->string('apellido');
-            $table->foreignId('tipoDocumentoId')
+            $table->foreignId('tipodocumento_id')
                 ->constrained('tipo_documentos')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
             $table->string('numero_documento');
-            $table->string('telefono');
+            $table->string('telefono')->nullable();
             $table->string('email')->nullable();
+            $table->integer('porcentaje_repartidor');
+            $table->integer('porcentaje_marca');
+            $table->string('password');
             $table->timestamps();
         });
     }

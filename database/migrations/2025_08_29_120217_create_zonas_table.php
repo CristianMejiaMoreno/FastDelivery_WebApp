@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->decimal('precio_sugerido');
+            $table->double('latitud');
+            $table->double('longitud');
             $table->timestamps();
         });
     }
