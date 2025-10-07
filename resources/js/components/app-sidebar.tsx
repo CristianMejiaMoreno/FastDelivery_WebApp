@@ -5,15 +5,43 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Users, Map, UserRoundPlus, ListOrdered, Banknote } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Inicio',
         href: dashboard(),
         icon: LayoutGrid,
     },
+    {
+        title: 'Repartidores',
+        href: '/repartidores',
+        icon: Users
+    },
+    {
+        title: 'Clientes',
+        href: '/clientes',
+        icon: UserRoundPlus
+    },
+    {
+        title: 'Zonas',
+        href: '/zonas',
+        icon: Map
+    },
+    {
+        title: 'Pedidos',
+        href: '/pedidos',
+        icon: ListOrdered 
+    },
+    {
+        title: 'Ventas',
+        href: '/ventas',
+        icon: Banknote 
+    },
+
+
+
 ];
 
 const footerNavItems: NavItem[] = [
