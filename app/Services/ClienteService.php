@@ -15,7 +15,7 @@ class ClienteService
 
     public function getClientes($q = null)
     {
-        $query = Cliente::query();
+        $query = Cliente::with("tipo_documento");
 
         if($q){
             $query->where(function($sub) use ($q){
@@ -58,4 +58,12 @@ class ClienteService
 
         return true;
     }
+
+    public function getClienteByNumDocumento($numDocumento)
+    {
+        $cliente = Cliente::where('numero_documento', '=', $numDocumento)->first();
+
+        return $cliente;
+    }
+
 }

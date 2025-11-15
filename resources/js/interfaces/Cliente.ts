@@ -1,8 +1,11 @@
+import { TipoDocumento } from "./TipoDocumento";
+
 export interface Cliente{
-    id:number;
-    nombre_cliente:number;
+    id?:number | null;
+    nombre_cliente:string;
     tipodocumento_id:number;
-    numero_documento:number;
+    tipo_documento: TipoDocumento;
+    numero_documento:string;
     telefono:string;
     email:string;
 }
@@ -10,18 +13,21 @@ export interface Cliente{
 export interface ClienteModalProps{
       open: boolean
       onClose: () => void
-      initialData?: Cliente | null
+      initialData?: Cliente | null,
+      onSuccess?: ()=>void
 }
 
 export interface ClienteDeleteModalProps{
     onClose: ()=> void,
-    open: boolean
+    open: boolean,
+    data: Cliente | null
 }
 
 export interface ClienteFormProps {
   initialData?: Cliente | null
-  onSubmit: (data: Omit<Cliente, "id">) => void
-  onCancel: () => void
+  onSubmit?: (data: Omit<Cliente, "id">) => void
+  onClose: () => void
+  onSuccess?: ()=>void
 }
 
 export interface ClienteOption{

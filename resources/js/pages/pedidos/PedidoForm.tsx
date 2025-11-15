@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Pedido, PedidoFormProps } from '@/interfaces/Pedido'
 import { Button } from '@/components/ui/button'
 import { Banknote, Calendar1Icon, Coins, HandCoins, Info, Map, Notebook, Percent, Truck, User } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import {Calendar} from '@/components/ui/calendar'
 import {Popover} from '@/components/ui/popover'
@@ -18,7 +18,9 @@ import { RepartidorOption } from '@/interfaces/Repartidor'
 import { ZonaOption } from '@/interfaces/Zona'
 import ZonaSelect from '../selects/ZonaSelect'
 import { validatePedido } from '@/validations/PedidoValidation'
-
+import { getColorEstado } from '@/helpers/getEstadoColor'
+import { actualizarPedido, crearPedido } from '@/api/Pedido'
+import { toast } from "sonner"
 
 export default function PedidoForm({onClose, initialData}: PedidoFormProps){
 
@@ -39,16 +41,73 @@ export default function PedidoForm({onClose, initialData}: PedidoFormProps){
         observacion: initialData?.observacion || ''
     });
 
-    const [fechaPedido, setFechaPedido] = useState<Date | undefined>(new Date());;
-    const [fechaEntrega, setFechaEntrega] = useState<Date | undefined>(new Date());
+    const [fechaPedido] = useState<Date | undefined>(new Date());;
+    const [fechaEntrega] = useState<Date | undefined>(new Date());
 
     const [clienteSeleccionado, setClienteSeleccionado] = useState<ClienteOption | null>(null);
     const [repartidorSeleccionado, setRepartidorSeleccionado] = useState<RepartidorOption | null>(null);
     const [zonaSeleccionado, setZonaSeleccionado] = useState<ZonaOption | null>(null);
-
     const [errors, setErrors] = useState<Record<string, string>>({})
+    const [valorBaseMensajero, setValorBaseMensajero] = useState(form.total_mensajero); // Valor inicial
+    const [valorAdicional, setValorAdicional] = useState(0);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    useEffect(()=>{
+
+        if (initialData) {
+            const fechaPedidoLocal = initialData.fecha_pedido
+                ? new Date(initialData.fecha_pedido + "T00:00:00") // Asegura que se interprete como local
+                : new Date();
+
+            const fechaEntregaLocal = initialData.fecha_entrega
+                ? new Date(initialData.fecha_entrega + "T00:00:00") // Asegura que se interprete como local
+                : new Date();
+
+            setForm((prev) => ({
+                ...prev,
+                fecha_pedido: fechaPedidoLocal,
+                fecha_entrega: fechaEntregaLocal,
+            }));
+        }
+
+        if(initialData?.cliente_id && initialData.cliente){
+            const clienteOption: ClienteOption ={
+                value: initialData.cliente_id,
+                label: String(initialData.cliente.nombre_cliente)
+            }
+
+            setClienteSeleccionado(clienteOption)
+            setForm(prev=> ({...prev, cliente_id: clienteOption.value}))
+        }
+
+        if(initialData?.repartidor_id && initialData.repartidor){
+            const repartidorOption : RepartidorOption = {
+                value: initialData.repartidor_id,
+                label: initialData.repartidor.nombre +''+ initialData.repartidor.apellido,
+                porcentaje_marca: initialData.repartidor.porcentaje_marca,
+                porcentaje_repartidor: initialData.repartidor.porcentaje_repartidor
+            }
+
+            setRepartidorSeleccionado(repartidorOption)
+            setForm(prev => ({...prev, repartidor_id: repartidorOption.value}))
+        }
+
+        if(initialData?.zona_id && initialData.zona){
+            const zonaOption: ZonaOption = {
+                value: initialData.zona_id,
+                label: initialData.zona.nombre,
+                precio: initialData.zona.precio_sugerido
+            }
+
+            setZonaSeleccionado(zonaOption)
+            setForm(prev=> ({...prev, zona_id: zonaOption.value}))
+        }
+
+    }, [initialData]);
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        toast("Event has been created.")
+
         e.preventDefault()
 
         const validationErrors = validatePedido(form)
@@ -61,17 +120,47 @@ export default function PedidoForm({onClose, initialData}: PedidoFormProps){
             return
         }
 
-        console.log("formulario valido:", form)
+        try{
+            //para editar
+            if(initialData){
+                const updatePedido = {
+                    ...form,
+                    cliente_id: clienteSeleccionado?.value || null,
+                    repartidor_id: repartidorSeleccionado?.value || null,
+                    zona_id: zonaSeleccionado?.value || null
+                }
+
+                await actualizarPedido(initialData.id, updatePedido);
+            }else{
+                const newPedido = {
+                    ...form,
+                    cliente_id: clienteSeleccionado?.value || null,
+                    repartidor_id: repartidorSeleccionado?.value || null,
+                    zona_id: zonaSeleccionado?.value || null
+                }
+                await crearPedido(newPedido)
+            }
+
+            onClose();
+        }catch(error){
+            console.error("Error al guardar el pedido", error);
+        }
+
     }
+
 
     return (
     <Card>
         <CardHeader>
             <CardTitle>
-                Prueba Title
+                {initialData ? `Pedido ${initialData.codigo_pedido}` : ""}
             </CardTitle>
             <CardDescription>
-                loreeem
+                {initialData && (
+                    <p className={`text-sm ${getColorEstado(initialData.estado)}`}>
+                        Estado del pedido:  {initialData.estado.toUpperCase()}
+                    </p>
+                )}
             </CardDescription>
         </CardHeader>
 
@@ -145,6 +234,8 @@ export default function PedidoForm({onClose, initialData}: PedidoFormProps){
                                     precio: option ? Number(option.precio) : 0,
                                     total_mensajero: option ? Number(option.precio) : 0
                                 }))
+                                setValorBaseMensajero(option?.precio ?? 0)
+                                console.log("prueba", valorBaseMensajero)
                             }}
                         />
 
@@ -167,7 +258,13 @@ export default function PedidoForm({onClose, initialData}: PedidoFormProps){
                         </Label>
                         <Input
                             readOnly
-                            value={form.precio}
+                            value={
+                                new Intl.NumberFormat("es-CO", {
+                                    style: "currency",
+                                    currency: "COP",
+                                    minimumFractionDigits:0
+                                }).format(form.precio)
+                            }
                             className='h-10 text-sm px-4 w-full'
                             placeholder='Ingresa el precio'
                             onChange={(e)=>{
@@ -196,15 +293,20 @@ export default function PedidoForm({onClose, initialData}: PedidoFormProps){
                         <PopoverTrigger asChild>
                             <Button
                             variant="outline"
-                            data-empty={!fechaPedido}
+                            data-empty={!form.fecha_pedido}
                             className="data-[empty=true]:text-muted-foreground w-full justify-start text-left font-normal"
                             >
                             <Calendar1Icon className="mr-2 h-4 w-4" />
-                            {fechaPedido ? format(fechaPedido, "PPP") : <span>Selecciona una fecha</span>}
+                            {fechaPedido ? format(form.fecha_pedido, "PPP") : <span>Selecciona una fecha</span>}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar required={false} mode="single" selected={fechaPedido} onSelect={setFechaPedido} initialFocus />
+                            <Calendar required={false}
+                            mode="single"
+                            selected={form.fecha_pedido}
+                            onSelect={(date)=> setForm((prev)=>({...prev, fecha_pedido: date || new Date()}))}
+                            initialFocus
+                        />
                         </PopoverContent>
                         </Popover>
                         {errors.fecha_pedido &&(
@@ -222,19 +324,25 @@ export default function PedidoForm({onClose, initialData}: PedidoFormProps){
                         <PopoverTrigger asChild>
                             <Button
                             variant="outline"
-                            data-empty={!fechaEntrega}
+                            data-empty={!form.fecha_entrega}
                             className="data-[empty=true]:text-muted-foreground w-full justify-start text-left font-normal"
                             >
                             <Calendar1Icon className="mr-2 h-4 w-4" />
                                 {fechaEntrega ? (
-                                format(fechaEntrega, "PPP")
+                                format(form.fecha_entrega, "PPP")
                                 ) : (
                                 <span>Selecciona una fecha</span>
                                 )}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar required={false} mode="single" selected={fechaEntrega} onSelect={setFechaEntrega} initialFocus />
+                            <Calendar
+                                required={false}
+                                mode="single"
+                                selected={form.fecha_entrega}
+                                onSelect={(date)=> setForm((prev)=>({...prev,  fecha_entrega: date || new Date()}))}
+                                initialFocus
+                             />
                         </PopoverContent>
                         </Popover>
                         {errors.fecha_entrega &&(
@@ -297,7 +405,30 @@ export default function PedidoForm({onClose, initialData}: PedidoFormProps){
                             <HandCoins className='h-4 w-4 text-amber-800'/>
                             Recaudo Mensajero
                         </Label>
-                        <Input type='number' placeholder='Ingrese un porcentaje'/>
+                        <Input
+                            value={form.recaudo_mensajero}
+                            onChange={(e) => {
+                                const valor = e.target.value.replace(/[^\d]/g, '');
+                                const nuevoValorAdicional = parseFloat(valor) || 0;
+                                const total = nuevoValorAdicional + valorBaseMensajero + (form.recaudo_empresa || 0);
+
+
+                                setValorAdicional(nuevoValorAdicional);
+                                setForm({...form, recaudo_mensajero: Number(valor), total_mensajero: total});
+
+                                console.log(total, "valor total");
+                            }}
+                            placeholder='Ingrese un valor de recaudo'
+                        />
+                        <p className='text-sm text-muted-foreground'>
+                            {
+                                new Intl.NumberFormat("es-CO",{
+                                    style:"currency",
+                                    currency:"COP",
+                                    minimumFractionDigits:0
+                                }).format(form.recaudo_mensajero || 0)
+                            }
+                        </p>
                         {errors.recaudo_mensajero && (
                             <p className='text-red-500 text-sm'>{errors.recaudo_mensajero}</p>
                         )}
@@ -309,16 +440,35 @@ export default function PedidoForm({onClose, initialData}: PedidoFormProps){
                             Recaudo Empresa
                         </Label>
                         <Input
-                            onChange={(e)=>{
-                                const valor = parseFloat(e.target.value)
+                            type='number'
+                            value={form.recaudo_empresa || ''}
+                            onChange={(e) => {
+                                const valor = parseFloat(e.target.value) || 0;
+                                const total = valor + valorAdicional + valorBaseMensajero;
                                 setForm((prev) => ({
                                     ...prev,
-                                    total_mensajero: valor ?  valor + prev.total_mensajero : prev.total_mensajero
-                                }))
+                                    recaudo_empresa: valor,
+                                    total_mensajero: total
+                                }));
+
+                                console.log({
+                                    'Recaudo Empresa': valor,
+                                    'Valor Adicional': valorAdicional,
+                                    'Valor Base': valorBaseMensajero,
+                                    'Total': valor + valorAdicional + valorBaseMensajero
+                                });
                             }}
-                            type='number'
-                            placeholder='Ingrese un porcentaje'
+                            placeholder="Ingrese un valor"
                         />
+                        <p className='text-sm text-muted-foreground'>
+                            {
+                                new Intl.NumberFormat("es-CO", {
+                                    style:"currency",
+                                    currency: "COP",
+                                    minimumFractionDigits:0
+                                }).format(form.recaudo_empresa)
+                            }
+                        </p>
                         {errors.recaudo_empresa && (
                             <p className='text-red-500 text-sm'>{errors.recaudo_empresa}</p>
                         )}
@@ -343,7 +493,18 @@ export default function PedidoForm({onClose, initialData}: PedidoFormProps){
                         <Coins className='h-8 w-8'/>
                         Total Mensajero
                     </Label>
-                    <Input readOnly value={form.total_mensajero} className='h-12 px-4 text-lg font-medium' placeholder='Ingrese un total' />
+                    <Input
+                        readOnly
+                        value={
+                            new Intl.NumberFormat("es-CO", {
+                                style: "currency",
+                                currency:"COP",
+                                minimumFractionDigits: 0
+                            }).format(form.total_mensajero)
+                        }
+                        className='h-12 px-4 text-lg font-medium'
+                        placeholder='Ingrese un total'
+                    />
                     {errors.total_mensajero && (
                         <p className='text-red-500 text-sm'>{errors.total_mensajero}</p>
                     )}

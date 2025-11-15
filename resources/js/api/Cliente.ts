@@ -24,13 +24,21 @@ export async function crearCliente(data:Partial<Cliente>):Promise<Cliente>{
     return res.json();
 }
 
-export async function actualizarCliente(data:Partial<Cliente>, id: number):Promise<Cliente> {
-    const res = await fetch(`${BASE_URL}/${id}`,{
+export async function actualizarCliente(data: Partial<Cliente>, id: number): Promise<Cliente> {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    const res = await fetch(`${BASE_URL}/${id}`, {
         method: "PUT",
-        headers: {'Content-Type' : 'application/json'},
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken || '',
+            'Accept': 'application/json'
+        },
+        credentials: 'include', // Incluye cookies
         body: JSON.stringify(data)
     });
-    if(!res.ok) throw new Error ('Error al actualizar el cliente');
+
+    if(!res.ok) throw new Error('Error al actualizar el cliente');
     return res.json();
 }
 

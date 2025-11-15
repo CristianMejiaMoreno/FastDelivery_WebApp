@@ -7,13 +7,13 @@ import React from 'react'
 
 
 
-export function ClienteDelete({open, onClose}: ClienteDeleteModalProps) {
+export function ClienteDelete({open, onClose, data}: ClienteDeleteModalProps) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
         <DialogContent>
             <DialogHeader>
                 <DialogTitle>
-                    ¿Estas seguro de borrar el registro de NomCliente?
+                    ¿Estas seguro de borrar el registro de {data?.nombre_cliente}?
                 </DialogTitle>
                 <DialogDescription>
                     This action cannot be undone. Are you sure you want to permanently
@@ -21,6 +21,9 @@ export function ClienteDelete({open, onClose}: ClienteDeleteModalProps) {
                 </DialogDescription>
             </DialogHeader>
             <DialogFooter>
+                <Button className='bg-red-700 hover:bg-red-600' onClick={onClose}>
+                    Cerrar
+                </Button>
                 <Button>Prueba</Button>
             </DialogFooter>
 

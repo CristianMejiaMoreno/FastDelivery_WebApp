@@ -32,7 +32,7 @@ class RepartidorController extends Controller
      */
     public function index()
     {
-        //
+
     }
 
     /**
@@ -46,9 +46,106 @@ class RepartidorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request)
     {
-        //
+        try {
+            $repartidor = $request->user();
+
+            if (!$repartidor) {
+                return response()->json([
+                    'error' => 'No autorizado. Token inválido o expirado.'
+                ], 401);
+            }
+
+            $pedidos = $this->repartidorService->getPedidoByRepartidor($repartidor->id);
+
+            if(!$pedidos)
+            {
+                return response()->json([
+                    'error'=> 'No se encontraron pedidos para este repartidor'
+                ], 404);
+            }
+
+            return response()->json($pedidos, 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Ha ocurrido un error inesperado: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function searchPedido(Request $request)
+    {
+        try
+        {
+
+            if(!$request->user())
+            {
+                return response()->json([
+                    'error'=>"No autorizado, vuelve a iniciar session. Token invalido"
+                ], 401);
+            }
+
+            $codigoPedido = $request->input('codigoPedido');
+            $repartidor = $request->user();
+
+            $pedido = $this->repartidorService->getPedidobyId($codigoPedido, $repartidor->id);
+
+            if($pedido->isEmpty())
+            {
+                return response()->json([
+                    "error"=>"No se han encontrado con el codigo enviado para este repartidor"
+                ], 404);
+            }
+
+            return response()->json([
+                "data"=>$pedido
+            ], 200);
+
+        }catch(Exception $e)
+        {
+            return response()->json([
+                'error'=>"Error desconozido, consulte al administrador"
+            ], 500);
+        }
+    }
+    public function pedidoMes(Request $request)
+    {
+        try {
+            if (!$request->user()) {
+                return response()->json([
+                    'error' => 'No autorizado, vuelve a iniciar sesión. Token inválido'
+                ], 401);
+            }
+
+            $mes = $request->input('mes');
+            $anio = $request->input('anio');
+            $repartidorId = $request->user()->id;
+
+            if (!$mes || !$anio) {
+                return response()->json([
+                    'error' => 'Debes enviar el mes y el año para realizar la consulta'
+                ], 400);
+            }
+
+            $pedidos = $this->repartidorService->getPedidosMensual($repartidorId ,$mes, $anio);
+
+            if ($pedidos->isEmpty()) {
+                return response()->json([
+                    'error' => 'No se han encontrado registros para las fechas enviadas'
+                ], 404);
+            }
+
+            return response()->json([
+                'data' => $pedidos
+            ], 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Error desconocido al tratar de obtener los datos: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

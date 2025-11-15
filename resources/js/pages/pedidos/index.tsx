@@ -10,7 +10,6 @@ import { getPedidos } from '@/api/Pedido';
 import DataTable, { TableColumn } from 'react-data-table-component';
 import { Pencil, Trash2 } from 'lucide-react';
 
-
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Pedidos', href: '/pedidos' },
 ];
@@ -47,16 +46,16 @@ export default function Index(){
 
 
     const getEstadoColor = (estado: string) => {
-    switch (estado) {
-        case "pendiente":
-        return "bg-orange-500 text-white hover:bg-orange-600";
-        case "entregado":
-        return "bg-green-500 text-white hover:bg-green-600";
-        case "cancelado":
-        return "bg-red-500 text-white hover:bg-red-600";
-        default:
-        return "bg-gray-500 text-white hover:bg-gray-600";
-    }
+        switch (estado) {
+            case "pendiente":
+            return "bg-orange-500 text-white hover:bg-orange-600";
+            case "entregado":
+            return "bg-green-500 text-white hover:bg-green-600";
+            case "cancelado":
+            return "bg-red-500 text-white hover:bg-red-600";
+            default:
+            return "bg-gray-500 text-white hover:bg-gray-600";
+        }
     };
 
 
@@ -160,6 +159,7 @@ export default function Index(){
     ]
 
     const handleCreate = ()=>{
+        setSelectedPedido(null)
         setOpenModal(true);
     }
 

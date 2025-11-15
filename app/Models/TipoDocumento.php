@@ -15,4 +15,9 @@ class TipoDocumento extends Model
     {
         return $this->hasMany(Repartidores::class, 'tipodocumento_id');
     }
+
+    public function cliente()
+    {
+        return $this->hasMany(Cliente::class, "tipodocumento_id");
+    }
 }

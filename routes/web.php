@@ -3,6 +3,7 @@
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\RepartidoresController;
+use App\Http\Controllers\TipoDocumentoController;
 use App\Http\Controllers\VentasController;
 use App\Http\Controllers\ZonaController;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+
+    Route::get('tipoDocumento/list', [TipoDocumentoController::class, 'list'])->name('tipoDocumento.list');
 
     Route::get('repartidores/list', [RepartidoresController::class, 'list'])->name('repartidores.list');
     Route::resource('repartidores', RepartidoresController::class);

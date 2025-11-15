@@ -21,7 +21,8 @@ return new class extends Migration
             $table->foreignId('repartidor_id')
                 ->constrained('repartidores')
                 ->cascadeOnDelete()
-                ->cascadeOnUpdate();
+                ->cascadeOnUpdate()
+                ->nullable();
             $table->foreignId('zona_id')
                 ->constrained('zonas')
                 ->cascadeOnDelete()
@@ -32,18 +33,27 @@ return new class extends Migration
             $table->enum('estado',
                 [
                     'pendiente',
+                    'disponible',
                     'asignado',
                     'en camino',
                     'cancelado',
                     'entregado'
                 ]
             )->default('pendiente');
+
+            $table->decimal('lat', 10, 7)->nullable();
+            $table->decimal('lng', 10, 7)->nullable();
+
             $table->integer('porcentaje_marca');
             $table->integer('porcentaje_mensajero');
-            $table->decimal('recaudo_mensajero');
-            $table->decimal('recaudo_empresa');
+            $table->decimal('recaudo_mensajero')->nullable();
+            $table->decimal('recaudo_empresa')->nullable();
             $table->decimal('total_mensajero');
-            $table->text('observacion');
+            $table->text('observacion')->nullable();
+
+            $table->dateTime('asignado_en')->nullable();
+            $table->dateTime('entregado_en')->nullable();
+            
             $table->timestamps();
         });
     }

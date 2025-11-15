@@ -17,6 +17,10 @@ class Cliente extends Model
         'email'
     ];
 
+    public function tipo_documento()
+    {
+        return $this->belongsTo(TipoDocumento::class, 'tipodocumento_id');
+    }
     public function pedido()
     {
         return $this->hasMany(Pedido::class,'cliente_id');

@@ -2,18 +2,23 @@
 
 namespace App\Services;
 
+use App\Models\Pedido;
 use App\Models\Repartidores;
 use Illuminate\Support\Facades\Hash;
-
+use App\Services\PedidoService;
+use Log;
 
 class RepartidorService
 {
+
+    protected $pedidoService;
+
     /**
      * Create a new class instance.
      */
-    public function __construct()
+    public function __construct(PedidoService $pedidoService)
     {
-        //
+        $this->pedidoService = $pedidoService;
     }
 
     public function getRepartidores($q = null)
@@ -81,6 +86,89 @@ class RepartidorService
             'repartidor' => $repartidor,
             'token' => $token
         ]);
+    }
+
+    public function getPedidoByRepartidor($repartidorId)
+    {
+
+        $pedido = Pedido::query()->join('repartidores',
+        'pedidos.repartidor_id', '=', 'repartidores.id')
+        ->select('pedidos.*')
+        ->where('pedidos.repartidor_id', $repartidorId)
+        ->get();
+
+        $total =  Pedido::query()->where('repartidor_id', $repartidorId)
+        ->sum('total_mensajero');
+
+        return [$pedido, $total];
+    }
+
+    public function getPedidosMensual($repartidorId, $mes, $anio)
+    {
+        $query = Pedido::query()
+            ->where('repartidor_id', $repartidorId)
+            ->whereMonth('fecha_entrega', $mes)
+            ->whereYear('fecha_entrega', $anio);
+
+        Log::info('Consulta SQL generada: ' . $query->toSql());
+        Log::info('Bindings: ' . json_encode($query->getBindings()));
+
+        $pedidos = $query->get();
+
+        return $pedidos;
+    }
+
+    public function getPedidosSemanal($repartidorId, $inicioSemana, $finSemana, $estado)
+    {
+        $query = Pedido::query()
+                ->where('repartidor_id', $repartidorId)
+                ->whereBetween('fecha_pedido', [$inicioSemana, $finSemana]);
+
+        if(!$estado)
+        {
+            $query->where('estado', $estado);
+        }
+
+        return $query->get();
+    }
+
+    public function getPedidosDia($repartidorId, $dia, $estado)
+    {
+        $query = Pedido::query()
+                ->where('repartidor_id', $repartidorId)
+                ->whereDate('fecha_pedido', $dia);
+        
+        if($estado)
+        {
+            $query->where('estado', $estado);
+        }
+
+        return $query->get();
+    }
+
+    public function getPedidobyId($codigoPedido, $repartidorId)
+    {
+        $pedido = Pedido::query();
+
+        $pedido = $pedido->join('repartidores',
+        'pedidos.repartidor_id', '=', 'repartidores.id')
+        ->select('pedidos.*')
+        ->where('pedidos.repartidor_id', $repartidorId)
+        ->where('pedidos.codigo_pedido', $codigoPedido)
+        ->first();
+
+        return $pedido;
+ 
+    }
+
+    public function getPedidosDisponibles()
+    {  
+        $pedido = Pedido::query();
+
+        $pedidos = $pedido->where('estado', '=', 'disponible')->get();
+
+        return $pedidos;
+
     }
 
 }

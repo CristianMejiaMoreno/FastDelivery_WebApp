@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import DataTable, { TableColumn } from 'react-data-table-component';
 import { Button } from '@/components/ui/button';
 import { ClienteModal } from './ClienteModal';
-import { Plus } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { ClienteDelete } from './ClienteDelete';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -22,8 +22,11 @@ export default function Index() {
   const[perPage, setPerPage] = useState(15);
   const[openModal, setOpenModal] = useState(false);
   const[openDelete, setOpenDelete] = useState(false);
+  const[selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
+  const [deleteCliente, setDeleteCliente] = useState<Cliente | null>(null);
+ const [search, setSearch]=useState('');
 
-  const fetchRepartidores = async(page: number =1, q: string = '') => {
+  const fetchClientes = async(page: number =1, q: string = '') => {
     setLoading(true)
     try{
       const data = await getClientes(page, q);
@@ -38,27 +41,59 @@ export default function Index() {
   };
 
   useEffect(()=>{
-    fetchRepartidores(); //carga inicial
+    fetchClientes(); //carga inicial
   }, []);
 
   const handleCreate = ()=>{
+    setSelectedCliente(null)
     setOpenModal(true)
     console.log('estoy oprimiendo')
   }
 
-  const handleDelete = () => {
+  const handleEdit = (cliente:Cliente) => {
+    setSelectedCliente(cliente)
+    setOpenModal(true)
+    console.log(cliente)
+  }
+
+  const handleDelete = (cliente:Cliente) => {
+     setDeleteCliente(cliente)
      setOpenDelete(true)
-     console.log('jojo')
+     console.log(cliente)
+     console.log('jojo', cliente.id)
   }
 
   const columns: TableColumn<Cliente>[] = [
-    {name: 'ID', selector: row => row.id, sortable: true},
+    {name: 'ID', selector: row => row.id ?? 0, sortable: true},
     {name: 'Nombre', selector: row => row.nombre_cliente, sortable: true},
-    {name: 'Tipo Documento', selector: row => row.tipodocumento_id, sortable:true},
+    {name: 'Tipo Documento', selector: row => row.tipo_documento.nombre, sortable:true},
     {name: 'Numero Documento', selector: row => row.numero_documento, sortable:true},
     {name : 'Numero Documento', selector: row => row.numero_documento, sortable: true},
     {name: 'Teléfono', selector: row => row.telefono, sortable: true},
-    {name: 'Email', selector: row => row.email, sortable: true}
+    {name: 'Email', selector: row => row.email, sortable: true},
+    {
+        name:'Acciones',
+        cell:(row)=> (
+            <div className='flex gap-2'>
+                <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={()=>handleEdit(row)}
+                >
+                    <Pencil className='h-4 w-4' />
+                </Button>
+
+                <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={()=>handleDelete(row)}
+                >
+                    <Trash2 className='h-4 w-4' />
+                </Button>
+
+            </div>
+        )
+    }
   ];
 
 
@@ -74,10 +109,10 @@ export default function Index() {
                     Crear Cliente
                 </Button>
 
-                <Button className='bg-red-500' onClick={()=>handleDelete()}>
+                {/* <Button className='bg-red-500' onClick={()=>handleDelete(1)}>
                 <Plus />
                     Eliminar Cliente
-                </Button>
+                </Button> */}
             </div>
 
 
@@ -92,7 +127,7 @@ export default function Index() {
               paginationServer
               paginationTotalRows={totalRows}
               paginationPerPage={perPage}
-              onChangePage={(page) => fetchRepartidores(page)}
+              onChangePage={(page) => fetchClientes(page)}
               highlightOnHover
             />
         </div>
@@ -101,9 +136,12 @@ export default function Index() {
         <ClienteModal
             open={openModal}
             onClose={()=>{setOpenModal(false)}}
+            initialData={selectedCliente}
+            onSuccess={fetchClientes}
         />
 
         <ClienteDelete
+            data={deleteCliente}
             open={openDelete}
             onClose={()=>{setOpenDelete(false)}}
         />
